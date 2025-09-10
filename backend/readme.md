@@ -34,4 +34,5 @@ POST /shorturls
 Redirects to the original URL associated with the provided short ID.
 
 
-
+# used a map to store the shortcode and url
+# const store = new Map();
