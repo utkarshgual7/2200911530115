@@ -2,7 +2,7 @@ const http = require('http');
 const url = require('url');
 
 const port = process.env.PORT || 3000;
-const store = new Map();
+const store = new Map(); // stores shortcode -> {url, expiry, created, clicks: []}
 
 const server = http.createServer(async (req, res) => {
   // CORS headers
@@ -35,7 +35,9 @@ const server = http.createServer(async (req, res) => {
         
         store.set(shortcode, {
           url: data.url,
-          expiry: expiry
+          expiry: expiry,
+          created: new Date(),
+          clicks: []
         });
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -51,6 +53,35 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
+  // GET /shorturls/:shortcode/stats - this gets the stats for the shorten url using shortcode
+  if (req.url.startsWith('/shorturls/') && req.method === 'GET' && req.url.endsWith('/stats')) {
+    const shortcode = req.url.split('/')[2];
+    const record = store.get(shortcode);
+
+    if (record) {
+      const now = new Date();
+      if (now < record.expiry) {
+        const stats = {
+          clicks: record.clicks.length,
+          url: record.url,
+          created: record.created.toISOString(),
+          expiry: record.expiry.toISOString(),
+          click_data: record.clicks
+        };
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(stats));
+        return;
+      } else {
+        store.delete(shortcode);
+      }
+    }
+
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Short URL not found or expired' }));
+    return;
+  }
+
   // Handle GET /:shortcode - Redirect to original URL
   if (req.url.startsWith('/') && req.method === 'GET' && req.url !== '/') {
     const shortcode = req.url.substring(1);
@@ -59,6 +90,14 @@ const server = http.createServer(async (req, res) => {
     if (record) {
       const now = new Date();
       if (now < record.expiry) {
+        // Track the click
+        const clickData = {
+          timestamp: now.toISOString(),
+          source: req.headers.referer || 'direct',
+          location: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown'
+        };
+        record.clicks.push(clickData);
+        
         res.writeHead(302, { 'Location': record.url });
         res.end();
         return;
@@ -72,7 +111,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
-  // if user is trying to access "/" page then show the avialbale apis
+  // if user is trying to access "/" page then show the available apis
   if (req.url === '/' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(`
@@ -81,6 +120,7 @@ const server = http.createServer(async (req, res) => {
       <ul>
         <li>POST /shorturls - Create a short URL</li>
         <li>GET /:shortcode - Redirect to original URL</li>
+        <li>GET /shorturls/:shortcode/stats - Get statistics for a short URL</li>
       </ul>
     `);
     return;
