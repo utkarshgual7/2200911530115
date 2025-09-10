@@ -141,12 +141,25 @@ npm start
 
 ### Postman API Testing
 
+<img width="1918" height="958" alt="Screenshot 2025-09-10 140848" src="https://github.com/user-attachments/assets/fef2203c-2926-4321-ba70-fcca309d09c4" />
+
+### Log API TESTING POSTMAN
+
+<img width="1275" height="1075" alt="Screenshot 2025-09-10 140942" src="https://github.com/user-attachments/assets/49994d92-123c-45f4-b5c5-82389d178b3a" />
+
 #### Create Short URL Test
+<img width="1918" height="1078" alt="Screenshot 2025-09-10 142054" src="https://github.com/user-attachments/assets/018c3801-1dac-4e8e-85a2-40602f73166b" />
 
 
+### ROUTE NOT FOUND 
+<img width="1422" height="830" alt="Screenshot 2025-09-10 142724" src="https://github.com/user-attachments/assets/18944d27-26d3-4d25-9812-b955c2a7c49c" />
 
 
 #### Individual URL Stats Test
+<img width="1267" height="927" alt="Screenshot 2025-09-10 145513" src="https://github.com/user-attachments/assets/067a9b37-a893-41ad-b610-e5ff5ecf9360" />
+
 
 #### Redirect Test
+<img width="1357" height="642" alt="Screenshot 2025-09-10 142551" src="https://github.com/user-attachments/assets/b4975074-3fe3-4d14-a044-2786894b2188" />
+
 
