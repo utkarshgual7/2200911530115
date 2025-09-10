@@ -121,6 +121,36 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
+  // GET /api/shorturls/stats - Get all shortened URLs and their statistics
+  if (pathname === '/api/shorturls/stats' && req.method === 'GET') {
+    logger.logBackend('info', 'url-shortener', 'All stats requested');
+    
+    const allStats = [];
+    const now = new Date();
+    
+    for (const [shortcode, record] of store.entries()) {
+      if (now < record.expiry) {
+        allStats.push({
+          shortcode: shortcode,
+          url: record.url,
+          created: record.created.toISOString(),
+          expiry: record.expiry.toISOString(),
+          clicks: record.clicks.length,
+          click_data: record.clicks,
+          shortlink: `http://localhost:${port}/${shortcode}`
+        });
+      } else {
+        // Clean up expired entries
+        store.delete(shortcode);
+      }
+    }
+    
+    logger.logBackend('info', 'url-shortener', `All stats retrieved: ${allStats.length} active URLs`);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(allStats));
+    return;
+  }
+  
   // GET /api/shorturls/stats/:shortcode - Get stats for shortened URL
   if (pathname.startsWith('/api/shorturls/stats/') && req.method === 'GET') {
     const shortcode = pathname.split('/')[4];

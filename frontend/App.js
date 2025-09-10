@@ -2,6 +2,7 @@
 const { useState } = React;
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('home');
   const [longUrl, setLongUrl] = useState('');
   const [validity, setValidity] = useState(30);
   const [shortcode, setShortcode] = useState('');
@@ -71,8 +72,26 @@ function App() {
     alert('URL copied to clipboard!');
   };
 
+  if (currentPage === 'stats') {
+    return React.createElement(Stats);
+  }
+
   return (
     <div className="app-container">
+      <div className="navigation">
+        <button 
+          className={currentPage === 'home' ? 'nav-button active' : 'nav-button'}
+          onClick={() => setCurrentPage('home')}
+        >
+          Home
+        </button>
+        <button 
+          className={currentPage === 'stats' ? 'nav-button active' : 'nav-button'}
+          onClick={() => setCurrentPage('stats')}
+        >
+          Statistics
+        </button>
+      </div>
       <div className="url-form">
         <h1 className="title">URL Shortener</h1>
         <p className="subtitle">Shorten long URLs easily</p>
@@ -153,5 +172,3 @@ function App() {
     </div>
   );
 }
-
-// App component is now available globally
