@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Card, CardContent, Box, Alert } from '@mui/material';
-import './App.css';
+// Using global React from CDN
+const { useState } = React;
 
 function App() {
   const [longUrl, setLongUrl] = useState('');
@@ -42,22 +41,26 @@ function App() {
     }
     
     try {
- 
-      const response = await fetch('api/shorturls', {
+      const response = await fetch('/api/shorturls', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: {
-          longUrl: longUrl,
-          validity: validity
-          shortcode: shortcode
-        }
-        
-      }
+        body: JSON.stringify({
+          url: longUrl,
+          validity: validity,
+          shortcode: shortcode || undefined
+        })
+      });
       
-      setShortenedUrl(response.shortUrl);
-      setSuccess(true);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setShortenedUrl(data.shortlink);
+        setSuccess(true);
+      } else {
+        setError(data.error || 'Failed to shorten URL');
+      }
     } catch (err) {
       setError('Failed to shorten URL. Please try again.');
     }
@@ -65,112 +68,90 @@ function App() {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortenedUrl);
+    alert('URL copied to clipboard!');
   };
 
   return (
-    <Container maxWidth="sm" className="App">
-      <Box sx={{ mt: 8, mb: 4 }}>
-        <Typography variant="h3" component="h1" align="center" gutterBottom>
-          URL Shortener
-        </Typography>
-        <Typography variant="subtitle1" align="center" color="textSecondary" gutterBottom>
-          Shorten long URLs easily
-        </Typography>
-      </Box>
+    <div className="app-container">
+      <div className="url-form">
+        <h1 className="title">URL Shortener</h1>
+        <p className="subtitle">Shorten long URLs easily</p>
 
-      <Card variant="outlined">
-        <CardContent>
+        <div className="form-card">
           <form onSubmit={handleSubmit}>
             {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
+              <div className="error-alert">
                 {error}
-              </Alert>
+              </div>
             )}
             
             {success && (
-              <Alert severity="success" sx={{ mb: 2 }}>
+              <div className="success-alert">
                 URL successfully shortened!
-              </Alert>
+              </div>
             )}
             
-            <TextField
-              fullWidth
-              label="Long URL"
-              variant="outlined"
-              value={longUrl}
-              onChange={(e) => setLongUrl(e.target.value)}
-              placeholder="https://very-very-very-long.com/very/long/url"
-              margin="normal"
-              required
-            />
+            <div className="form-field">
+              <label htmlFor="longUrl">Long URL</label>
+              <input
+                id="longUrl"
+                type="url"
+                value={longUrl}
+                onChange={(e) => setLongUrl(e.target.value)}
+                placeholder="https://very-very-very-long.com/very/long/url"
+                required
+              />
+            </div>
             
-            <TextField
-              fullWidth
-              label="Validity (days)"
-              variant="outlined"
-              type="number"
-              value={validity}
-              onChange={(e) => setValidity(e.target.value)}
-              margin="normal"
-              InputProps={{ inputProps: { min: 1 } }}
-            />
+            <div className="form-field">
+              <label htmlFor="validity">Validity (days)</label>
+              <input
+                id="validity"
+                type="number"
+                value={validity}
+                onChange={(e) => setValidity(e.target.value)}
+                min="1"
+              />
+            </div>
             
-            <TextField
-              fullWidth
-              label="Short Code (optional)"
-              variant="outlined"
-              value={shortcode}
-              onChange={(e) => setShortcode(e.target.value)}
-              placeholder="Custom short code"
-              margin="normal"
-            />
+            <div className="form-field">
+              <label htmlFor="shortcode">Short Code (optional)</label>
+              <input
+                id="shortcode"
+                type="text"
+                value={shortcode}
+                onChange={(e) => setShortcode(e.target.value)}
+                placeholder="Custom short code"
+              />
+            </div>
             
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              size="large"
-              sx={{ mt: 2, py: 1.5 }}
-            >
+            <button type="submit" className="submit-button">
               Shorten URL
-            </Button>
+            </button>
           </form>
           
           {success && shortenedUrl && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Your shortened URL:
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
-                  fullWidth
-                  value={shortenedUrl}
-                  readOnly
-                  variant="outlined"
-                  margin="normal"
-                />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCopy}
-                  sx={{ ml: 1, height: '56px' }}
-                >
-                  Copy
-                </Button>
-              </Box>
-            </Box>
+            <div className="result-card">
+              <h3>Your shortened URL:</h3>
+              <div className="shortened-url">
+                {shortenedUrl}
+              </div>
+              <button
+                onClick={handleCopy}
+                className="copy-button"
+              >
+                Copy to Clipboard
+              </button>
+            </div>
           )}
-        </CardContent>
-      </Card>
-      
-      <Box sx={{ mt: 4, textAlign: 'center' }}>
-        <Typography variant="body2" color="textSecondary">
+        </div>
+        
+        <div className="footer-text">
           Enter a long URL to generate a shortened link
-        </Typography>
-      </Box>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }
 
-export default App;
+// App component is now available globally

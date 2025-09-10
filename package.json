@@ -1,0 +1,25 @@
+{
+  "name": "url-shortener-app",
+  "version": "1.0.0",
+  "description": "URL Shortener with frontend  backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@mui/material": "^5.14.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0"
+  },
+  "keywords": [
+    "url-shortener",
+    "react",
+    "nodejs"
+  ],
+  "author": "utkarsh",
+  "license": "ISC"
+}
