@@ -1,5 +1,6 @@
 const http = require('http');
 const url = require('url');
+const { logger } = require('../logging_middleware');
 
 const port = process.env.PORT || 3000;
 const store = new Map(); // stores shortcode -> {url, expiry, created, clicks: []}
@@ -17,6 +18,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  
   // Handle POST /shorturls - Create short URL
   if (req.url === '/shorturls' && req.method === 'POST') {
     let body = '';
@@ -53,9 +55,9 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
-  // GET /shorturls/:shortcode/stats - this gets the stats for the shorten url using shortcode
-  if (req.url.startsWith('/shorturls/') && req.method === 'GET' && req.url.endsWith('/stats')) {
-    const shortcode = req.url.split('/')[2];
+  // GET /shorturls/stats/:shortcode - this gets the stats for the shorten url using shortcode
+  if (req.url.startsWith('/shorturls/stats/') && req.method === 'GET') {
+    const shortcode = req.url.split('/')[3];
     const record = store.get(shortcode);
 
     if (record) {
@@ -83,7 +85,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Handle GET /:shortcode - Redirect to original URL
-  if (req.url.startsWith('/') && req.method === 'GET' && req.url !== '/') {
+  if (req.url.startsWith('/') && req.method === 'GET' && req.url !== '/' && !req.url.startsWith('/shorturls/')) {
     const shortcode = req.url.substring(1);
     const record = store.get(shortcode);
     
@@ -133,4 +135,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`URL Shortener service running on port ${port}`);
+  logger.logBackend('info', 'url-shortener', `URL Shortener service running on port ${port}`);
 });

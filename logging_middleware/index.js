@@ -1,5 +1,5 @@
 class LoggingMiddleware {
-  constructor(testServerUrl = 'http://20.244.56.144/evaluation-service/logs') {
+  constructor(testServerUrl = 'http://localhost:3000/logs') {
     this.testServerUrl = testServerUrl;
   }
 
@@ -8,39 +8,87 @@ class LoggingMiddleware {
       stack: stack,
       level: level,
       package: packageName,
-      message: message
+      message: message,
+      timestamp: new Date().toISOString()
     };
 
-    try {
-      const response = await fetch(this.testServerUrl, {
+    const http = require('http');
+    
+    return new Promise((resolve, reject) => {
+      const data = JSON.stringify(logData);
+      
+      const url = new URL(this.testServerUrl);
+      const options = {
+        hostname: url.hostname,
+        port: url.port,
+        path: url.pathname,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          authorization: `Bearer {token}`
-        },
-        body: JSON.stringify(logData)
+          'Content-Length': data.length
+        }
+      };
+      
+      const req = http.request(options, (res) => {
+        let responseData = '';
+        
+        res.on('data', (chunk) => {
+          responseData += chunk;
+        });
+        
+        res.on('end', () => {
+          try {
+            const result = JSON.parse(responseData);
+            resolve(result);
+          } catch (error) {
+            reject(new Error(`Failed to parse response: ${error}`));
+          }
+        });
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      throw new Error(`Logging failed: ${error}`);
-    }
+      
+      req.on('error', (error) => {
+        reject(new Error(`Logging failed: ${error}`));
+      });
+      
+      req.write(data);
+      req.end();
+    });
   }
 
+  // multiple logging  methods
   async logBackend(level, packageName, message) {
     return this.log('backend', level, packageName, message);
   }
+  async logFrontend(level, packageName, message) {
+    return this.log('frontend', level, packageName, message);
+  }
+
+  async debug(stack, packageName, message) {
+    return this.log(stack, 'debug', packageName, message);
+  }
+
+  async info(stack, packageName, message) {
+    return this.log(stack, 'info', packageName, message);
+  }
+
+  async warn(stack, packageName, message) {
+    return this.log(stack, 'warn', packageName, message);
+  }
+
+  async error(stack, packageName, message) {
+    return this.log(stack, 'error', packageName, message);
+  }
+
+  async fatal(stack, packageName, message) {
+    return this.log(stack, 'fatal', packageName, message);
+  }
+
 
 }
 
 const logger = new LoggingMiddleware();
 
-export default {
+module.exports = {
   LoggingMiddleware,
   logger
 };
