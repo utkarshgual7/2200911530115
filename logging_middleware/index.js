@@ -16,6 +16,7 @@ class LoggingMiddleware {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          authorization: `Bearer {token}`
         },
         body: JSON.stringify(logData)
       });
@@ -32,7 +33,7 @@ class LoggingMiddleware {
   }
 
   async logBackend(level, packageName, message) {
-    return this.log('backen', level, packageName, message);
+    return this.log('backend', level, packageName, message);
   }
 
 }

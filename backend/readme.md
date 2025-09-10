@@ -14,7 +14,7 @@ POST /shorturls
 **Request Body:**
 ```json
 {
-  "url": "https://jssaten.azure.website.com/login/pay/id/cse/core"
+  "url": "https://jssaten.azure.website.com/login/pay/id/cse/core",
   "validaty": 30,
   "shortcode": "abcd1"
 }
