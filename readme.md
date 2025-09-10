@@ -23,6 +23,8 @@ A  URL shortening service built with Node.js and React, featuring real-time anal
 - Responsive design with gradient styling
 - Copy-to-clipboard functionality
 
+<img width="1285" height="789" alt="image" src="https://github.com/user-attachments/assets/439d618c-9621-4968-bff7-dc5cbf884454" />
+
 
 ## Key Features
 
@@ -35,14 +37,12 @@ A  URL shortening service built with Node.js and React, featuring real-time anal
 ### Analytics & Tracking
 - **Click Tracking**: Real-time click counting with detailed metadata
 - **Source Detection**: Referrer and direct access tracking
-- **Location Data**: IP-based location tracking
 - **Timestamp Logging**: Precise click timing information
 
 ### User Interface
 - **Dual Navigation**: Home and Statistics pages
 - **Real-time Updates**: Live statistics refresh
 - **Responsive Design**: Mobile-friendly interface
-- **Modern Styling**: Gradient backgrounds and glassmorphism effects
 
 ## API Endpoints
 
